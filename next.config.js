@@ -1,24 +1,40 @@
-import withCSS from '@zeit/next-css';
-import withSass from '@zeit/next-sass';
-import withLess from '@zeit/next-less';
+/* eslint-disable */
+const withLess = require('@zeit/next-less')
+const lessToJS = require('less-vars-to-js')
+const fs = require('fs')
+const path = require('path')
 
-const isProd = process.env.NODE_ENV === 'production'
+// Where your antd-custom.less file lives
+const themeVariables = lessToJS(
+  fs.readFileSync(path.resolve(__dirname, './assets/styles/antd-custom.less'), 'utf8')
+)
 
-// fix: prevents error when .less files are required by node
-if (typeof require !== 'undefined') {
-  require.extensions['.less'] = file => { }
-}
-
-export default withLess(withSass(withCSS({
+module.exports = withLess({
   lessLoaderOptions: {
-    javascriptEnabled: true
-  }
-})))
+    javascriptEnabled: true,
+    modifyVars: themeVariables, // make your antd custom effective
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      const antStyles = /antd\/.*?\/style.*?/
+      const origExternals = [...config.externals]
+      config.externals = [
+        (context, request, callback) => {
+          if (request.match(antStyles)) return callback()
+          if (typeof origExternals[0] === 'function') {
+            origExternals[0](context, request, callback)
+          } else {
+            callback()
+          }
+        },
+        ...(typeof origExternals[0] === 'function' ? [] : origExternals),
+      ]
 
-export function webpack(config) {
-  // Fixes npm packages that depend on `fs` module
-  config.node = {
-    fs: 'empty'
-  };
-  return config;
-}
+      config.module.rules.unshift({
+        test: antStyles,
+        use: 'null-loader',
+      })
+    }
+    return config
+  },
+})
