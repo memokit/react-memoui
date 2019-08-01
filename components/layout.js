@@ -34,7 +34,7 @@ export default ({ children, title = 'This is the default title' }) => (
                     </Menu>
                 </Header>
             </Affix>
-            <Content style={{ padding: '10px 50px 0px 50px;' }}>
+            <Content style={{ padding: '10px 50px 0px 50px' }}>
                 
                 <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>{children}</div>
             </Content>
