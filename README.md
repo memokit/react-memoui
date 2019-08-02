@@ -44,3 +44,7 @@ This example shows how to use Next.js along with [Ant Design of React](http://an
 
 #### theme vars
 https://github.com/ant-design/ant-design/blob/master/components/style/themes/default.less
+
+
+
+https://www.digitalocean.com/community/tutorials/how-to-use-pm2-to-setup-a-node-js-production-environment-on-an-ubuntu-vps
